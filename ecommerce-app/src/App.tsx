@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Cart from "./pages/Cart";
+import SearchResults from "pages/SearchResults";
 
 const App: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/cart" element={<Cart />} />
-          {/* You can add more pages later */}
+          <Route path="/search" element={<SearchResults />} />
         </Routes>
       </Layout>
     </Router>

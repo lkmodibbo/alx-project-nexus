@@ -15,12 +15,12 @@ const Button: React.FC<ButtonProps> = ({
 
   const variantClasses =
     variant === "primary"
-      ? "bg-blue-600 text-white hover:bg-blue-700"
-      : "bg-gray-300 text-gray-800 hover:bg-gray-400";
+      ? "bg-orange-500 text-white hover:bg-orange-600"
+      : "bg-orange-200 text-gray-900 hover:bg-orange-300";
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses} ${className}`}
+      className={`${className} ${baseClasses} ${variantClasses}`}
       {...props}
     >
       {children}
