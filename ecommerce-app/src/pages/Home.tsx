@@ -1,16 +1,28 @@
-import { products } from "data/product";
-import ProductCard from "ui/ProductCard";
+import { useEffect, useState } from "react"
+import { getProducts } from "services/productServices";
+import { Product } from "types/Product"
+import ProductGrid from "ui/ProductGrid";
 
+const Home: React.FC = () => {
+    const [products, setProducts] = useState<Product[]>([]);
 
-const HomePage = () => {
-  return (
-    <div 
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
-  );
-};
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const data = await getProducts();
+                setProducts(data);
+            } catch (error) {
+                console.error("Error fetching products", error)
+            }
+        };
+        fetchProducts();
+    }, []);
 
-export default HomePage;
+    return (
+        <div className="p-6">
+            <ProductGrid products={products}/>
+        </div>
+    )
+}
+
+export default Home;
