@@ -1,6 +1,6 @@
 import { Product } from "types/Product";
 
-export const dummyProducts: Product[] = [
+export const products: Product[] = [
   {
     id: 1,
     name: "Wireless Headphones",
@@ -8,7 +8,7 @@ export const dummyProducts: Product[] = [
     price: 120,
     category: "Electronics",
     stock: 15,
-    image: "https://via.placeholder.com/150"
+    image: "https://via.placeholder.com/150",
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ export const dummyProducts: Product[] = [
     price: 90,
     category: "Electronics",
     stock: 20,
-    image: "https://via.placeholder.com/150"
+    image: "https://via.placeholder.com/150",
   },
   {
     id: 3,
@@ -26,6 +26,6 @@ export const dummyProducts: Product[] = [
     price: 75,
     category: "Fashion",
     stock: 30,
-    image: "https://via.placeholder.com/150"
-  }
+    image: "https://via.placeholder.com/150",
+  },
 ];

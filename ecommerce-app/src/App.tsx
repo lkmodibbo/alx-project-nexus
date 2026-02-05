@@ -2,10 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./layout/Layout";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import Cart from "./pages/Cart";
 import SearchResults from "pages/SearchResults";
+import AuthPage from "pages/AuthPage";
+
 
 const App: React.FC = () => {
   return (
@@ -13,9 +13,8 @@ const App: React.FC = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/search" element={<SearchResults />} />
         </Routes>
       </Layout>

@@ -1,3 +1,4 @@
+import { useCart } from "context/CartContext";
 import { Product } from "../types/Product";
 import { useState } from "react";
 
@@ -6,7 +7,8 @@ interface Props {
 }
 
 const ProductCard: React.FC<Props> = ({ product }) => {
-  const [added, setAdded] = useState(false);
+  const { cartItems, toggleProduct } = useCart();
+  const added = cartItems.some(p => p.id === product.id)
 
   return (
     <div className="border rounded-md bg-white shadow-sm hover:shadow-md transition overflow-hidden max-w-[220px]">
@@ -26,7 +28,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           ${product.price.toFixed(2)}
         </p>
         <button
-          onClick={() => setAdded(true)}
+          onClick={() => toggleProduct(product)}
           className={`w-full mt-3 text-xs py-2 rounded border transition
             ${
               added
@@ -34,7 +36,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
                 : "bg-[#f68b1e] text-white hover:bg-[#e07c18] shadow-sm hover:shadow-md"
             }`}
         >
-          {added ? "Added to cart" : "Add to cart"}
+          {added ? "Remove from cart" : "Add to cart"}
         </button>
 
       </div>
