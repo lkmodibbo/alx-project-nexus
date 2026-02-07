@@ -8,14 +8,18 @@ import {
   FiSearch,
   FiStar,
 } from "react-icons/fi";
-import { useCart } from "context/CartContext";
-import Icon from "ui/Icon";
 import { FaUser } from "react-icons/fa";
+import { useCart } from "context/CartContext";
 
 const Header: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { cartItems } = useCart();
   const navigate = useNavigate();
+
+  // ✅ Icon renderer fix
+  const renderIcon = (IconComponent: any, className?: string) => {
+    return React.createElement(IconComponent, { className });
+  };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,9 +29,11 @@ const Header: React.FC = () => {
 
   return (
     <header className="bg-white shadow px-6 py-4 flex items-center justify-between">
+      {/* Left Section */}
       <div className="flex items-center gap-4">
-        <Icon icon={FaUser} className="text-xl text-white" />
-        <Icon icon={FiMenu} className="w-7 h-7 text-gray-700 cursor-pointer" />
+        {renderIcon(FaUser, "text-xl text-white")}
+
+        {renderIcon(FiMenu, "w-7 h-7 text-gray-700 cursor-pointer")}
 
         <Link
           to="/"
@@ -36,18 +42,19 @@ const Header: React.FC = () => {
           FlexShop
         </Link>
 
-        <Icon
-          icon={FiStar}
-          className="w-6 h-6 bg-[#f68b1e] text-white rounded-full p-1"
-        />
+        {renderIcon(
+          FiStar,
+          "w-6 h-6 bg-[#f68b1e] text-white rounded-full p-1"
+        )}
       </div>
 
+      {/* Search */}
       <form onSubmit={handleSearch} className="flex items-center w-1/2 mx-6">
         <div className="relative w-full">
-          <Icon
-            icon={FiSearch}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
+          {renderIcon(
+            FiSearch,
+            "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          )}
 
           <input
             type="text"
@@ -59,12 +66,13 @@ const Header: React.FC = () => {
         </div>
       </form>
 
+      {/* Right Section */}
       <div className="flex items-center gap-6">
         <Link
           to="/login"
           className="flex items-center gap-1 text-gray-700 hover:text-[#f68b1e] transition"
         >
-          <Icon icon={FiUser} className="w-6 h-6" />
+          {renderIcon(FiUser, "w-6 h-6")}
 
           <span className="text-sm font-medium hidden sm:inline">
             Account
@@ -75,7 +83,7 @@ const Header: React.FC = () => {
           to="/help"
           className="flex items-center gap-1 text-gray-700 hover:text-[#f68b1e] transition"
         >
-          <Icon icon={FiHelpCircle} className="w-6 h-6" />
+          {renderIcon(FiHelpCircle, "w-6 h-6")}
 
           <span className="text-sm font-medium hidden sm:inline">
             Help
@@ -83,10 +91,10 @@ const Header: React.FC = () => {
         </Link>
 
         <Link to="/cart" className="relative">
-          <Icon
-            icon={FiShoppingCart}
-            className="w-7 h-7 text-gray-700 hover:text-[#f68b1e]"
-          />
+          {renderIcon(
+            FiShoppingCart,
+            "w-7 h-7 text-gray-700 hover:text-[#f68b1e]"
+          )}
 
           {cartItems.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
