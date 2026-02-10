@@ -1,5 +1,6 @@
 import { useCart } from "context/CartContext";
 import { Product } from "../types/Product";
+import { productImages } from "utils/productImages";
 
 interface Props {
   product: Product;
@@ -8,6 +9,9 @@ interface Props {
 const ProductCard: React.FC<Props> = ({ product }) => {
   const { cartItems, toggleProduct } = useCart();
   const added = cartItems.some(p => p.id === product.id)
+
+  const imageUrl =  
+    productImages[product.id] || productImages.default;
 
   const renderStars = (rating?: number) => {
     const score = Math.round(rating ?? 0);
@@ -25,7 +29,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
   return (
     <div className="border rounded-md bg-white shadow-sm hover:shadow-md transition overflow-hidden max-w-[220px]">
       <img
-        src={product.image || "https://via.placeholder.com/300"}
+        src={imageUrl}
         alt={product.name}
         className="w-full h-56 object-cover"
       />
