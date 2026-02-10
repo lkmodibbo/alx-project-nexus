@@ -5,6 +5,7 @@ export interface Product {
     description?: string;
     category?: string
     price: number;
+    rating?: number;
     stock?: number;
     created_at?: string;
     updated_at?: string;

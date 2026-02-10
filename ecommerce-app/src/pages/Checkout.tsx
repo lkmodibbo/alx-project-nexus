@@ -1,10 +1,19 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "context/CartContext";
+import { useAuth } from "context/AuthContext";
+import { orderService } from "services/orderService";
+import { paymentService } from "services/paymentService";
 import ProductCard from "ui/ProductCard";
 import Button from "ui/Button";
+import Loader from "ui/Loader";
 
 const Checkout: React.FC = () => {
+  const navigate = useNavigate();
   const { cartItems, toggleProduct } = useCart();
+  const { token, isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Track quantity per product
   const [quantities, setQuantities] = useState(
@@ -23,12 +32,55 @@ const Checkout: React.FC = () => {
 
   // Calculate total
   const totalAmount = cartItems.reduce((total, item) => {
-    return total + item.price * (quantities[item.id] || 1);
+    return total + Number(item.price) * (quantities[item.id] || 1);
   }, 0);
 
   // Proceed to payment
-  const handleProceed = () => {
-    alert(`Proceeding to payment. Total: $${totalAmount.toFixed(2)}`);
+  const handleProceed = async () => {
+    // Check if user is authenticated
+    if (!isAuthenticated || !token) {
+      // Set flag to redirect back to checkout after login
+      localStorage.setItem("referredFrom", "checkout");
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Create order
+      const order = await orderService.createOrder(token, totalAmount);
+
+      // Add items to order
+      for (const item of cartItems) {
+        const quantity = quantities[item.id] || 1;
+        await orderService.addItemToOrder(
+          token,
+          order.id,
+          item.id,
+          quantity,
+          Number(item.price)
+        );
+      }
+
+      // Create payment
+      const payment = await paymentService.createPayment(
+        token,
+        order.id,
+        totalAmount,
+        "card"
+      );
+
+      // Redirect to payment page
+      navigate(
+        `/payment?orderId=${order.id}&paymentId=${payment.id}`
+      );
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setError("Failed to process checkout. Please try again.");
+      setLoading(false);
+    }
   };
 
   // Empty cart message
@@ -86,9 +138,27 @@ const Checkout: React.FC = () => {
         {/* Right: Order Summary */}
         <div className="flex-1 border rounded-md p-6 shadow flex flex-col gap-4 h-fit">
           <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
+          
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+              {error}
+            </div>
+          )}
+          
           <p>Total Items: {cartItems.length}</p>
           <p className="font-semibold text-lg">Total: ${totalAmount.toFixed(2)}</p>
-          <Button onClick={handleProceed}>Proceed to Payment</Button>
+          
+          <Button onClick={handleProceed} disabled={loading} className="w-full">
+            {loading ? "Processing..." : "Proceed to Payment"}
+          </Button>
+          
+          <button
+            onClick={() => navigate("/cart")}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+            disabled={loading}
+          >
+            Back to Cart
+          </button>
         </div>
       </div>
     </div>

@@ -7,13 +7,16 @@ import {
   FiMenu,
   FiSearch,
   FiStar,
+  FiLogOut,
 } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import { useCart } from "context/CartContext";
+import { useAuth } from "context/AuthContext";
 
 const Header: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { cartItems } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   // ✅ Icon renderer fix
@@ -68,16 +71,33 @@ const Header: React.FC = () => {
 
       {/* Right Section */}
       <div className="flex items-center gap-6">
-        <Link
-          to="/login"
-          className="flex items-center gap-1 text-gray-700 hover:text-[#f68b1e] transition"
-        >
-          {renderIcon(FiUser, "w-6 h-6")}
-
-          <span className="text-sm font-medium hidden sm:inline">
-            Account
-          </span>
-        </Link>
+        {isAuthenticated && user ? (
+          <>
+            <div className="flex items-center gap-2 text-gray-700">
+              {renderIcon(FiUser, "w-6 h-6")}
+              <span className="text-sm font-medium hidden sm:inline">
+                {user.name || user.username}
+              </span>
+            </div>
+            <button
+              onClick={logout}
+              className="flex items-center gap-1 text-gray-700 hover:text-red-600 transition"
+            >
+              {renderIcon(FiLogOut, "w-6 h-6")}
+              <span className="text-sm font-medium hidden sm:inline">Logout</span>
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/auth"
+            className="flex items-center gap-1 text-gray-700 hover:text-[#f68b1e] transition"
+          >
+            {renderIcon(FiUser, "w-6 h-6")}
+            <span className="text-sm font-medium hidden sm:inline">
+              Account
+            </span>
+          </Link>
+        )}
 
         <Link
           to="/help"
@@ -89,6 +109,15 @@ const Header: React.FC = () => {
             Help
           </span>
         </Link>
+
+        {cartItems.length > 0 && (
+          <button
+            onClick={() => navigate("/checkout")}
+            className="px-4 py-2 bg-[#f68b1e] text-white rounded-lg hover:bg-[#e07c18] transition font-medium text-sm"
+          >
+            Checkout
+          </button>
+        )}
 
         <Link to="/cart" className="relative">
           {renderIcon(

@@ -1,6 +1,5 @@
 import { useCart } from "context/CartContext";
 import { Product } from "../types/Product";
-import { useState } from "react";
 
 interface Props {
   product: Product;
@@ -10,6 +9,19 @@ const ProductCard: React.FC<Props> = ({ product }) => {
   const { cartItems, toggleProduct } = useCart();
   const added = cartItems.some(p => p.id === product.id)
 
+  const renderStars = (rating?: number) => {
+    const score = Math.round(rating ?? 0);
+    return (
+      <div className="flex items-center mt-1">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} className={i < score ? "text-yellow-400" : "text-gray-300"}>
+            ★
+          </span>
+        ))}
+        <span className="text-xs text-gray-500 ml-2">({rating ?? 0})</span>
+      </div>
+    );
+  }
   return (
     <div className="border rounded-md bg-white shadow-sm hover:shadow-md transition overflow-hidden max-w-[220px]">
       <img
@@ -25,7 +37,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
           {product.category || "Fashion Item"}
         </p>
         <p className="text-sm font-semibold text-gray-800 mt-2 text-right">
-          ${product.price.toFixed(2)}
+          ${Number(product.price).toFixed(2)}
         </p>
         <button
           onClick={() => toggleProduct(product)}

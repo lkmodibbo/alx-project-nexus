@@ -9,6 +9,7 @@ export const products: Product[] = [
     category: "Electronics",
     stock: 15,
     image: "https://via.placeholder.com/150",
+    rating: 4.5,
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ export const products: Product[] = [
     category: "Electronics",
     stock: 20,
     image: "https://via.placeholder.com/150",
+    rating: 4,
   },
   {
     id: 3,
@@ -27,5 +29,6 @@ export const products: Product[] = [
     category: "Fashion",
     stock: 30,
     image: "https://via.placeholder.com/150",
+    rating: 3.5,
   },
 ];

@@ -1,7 +1,8 @@
 // src/features/auth/components/SignupForm.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, FormikHelpers, FormikProps } from "formik";
 import * as Yup from "yup";
+import { authService } from "services/authService";
 import Button from "ui/Button";
 
 interface SignupFormValues {
@@ -14,9 +15,12 @@ interface SignupFormValues {
 
 interface Props {
   onSwitchToLogin: () => void;
+  onSignupSuccess: (payload: { message: string; userId?: number; email?: string }) => void;
 }
 
-const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
+const SignupForm: React.FC<Props> = ({ onSwitchToLogin, onSignupSuccess }) => {
+  const [apiError, setApiError] = useState<string | null>(null);
+
   const initialValues: SignupFormValues = {
     fullName: "",
     email: "",
@@ -45,18 +49,57 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
       .required("Confirm password is required"),
   });
 
-  const handleSubmit = (
+  const handleSubmit = async (
     values: SignupFormValues,
-    { setSubmitting }: FormikHelpers<SignupFormValues>
+    { setSubmitting, resetForm }: FormikHelpers<SignupFormValues>
   ) => {
-    console.log("Signup values:", values);
-    setSubmitting(false);
-    // TODO: call signup API
+    try {
+      setApiError(null);
+
+      // Call the register API
+      const reg = await authService.register(
+        values.email.split("@")[0], // Use email prefix as username
+        values.email,
+        values.password,
+        values.fullName
+      );
+
+      // Try to ensure a verification email is sent (backend may already do this)
+      try {
+        if (reg?.id) {
+          await authService.resendVerification(null, reg.id);
+        }
+      } catch (err) {
+        // Non-fatal: backend might already have sent email or endpoint may not exist
+        console.warn("resendVerification failed after register:", err);
+      }
+
+      // Clear form
+      resetForm();
+
+      // Show success message and provide userId/email for resend actions
+      onSignupSuccess({
+        message: "Account created. Verification email sent — please check your inbox.",
+        userId: reg?.id,
+        email: reg?.email,
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      const msg = error instanceof Error ? error.message : String(error);
+      setApiError(msg || "Failed to create account. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <>
       <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+      {apiError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+          {apiError}
+        </div>
+      )}
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -69,6 +112,7 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
               name="fullName"
               placeholder="Full Name"
               className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isSubmitting}
             />
             {errors.fullName && touched.fullName && (
               <div className="text-red-500 text-sm">{errors.fullName}</div>
@@ -78,6 +122,7 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
               type="email"
               name="email"
               placeholder="Email"
+              disabled={isSubmitting}
               className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.email && touched.email && (
@@ -87,6 +132,7 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
             <Field
               type="text"
               name="phone"
+              disabled={isSubmitting}
               placeholder="Phone Number"
               className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -97,6 +143,7 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
             <Field
               type="password"
               name="password"
+              disabled={isSubmitting}
               placeholder="Password"
               className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -107,6 +154,7 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
             <Field
               type="password"
               name="confirmPassword"
+              disabled={isSubmitting}
               placeholder="Confirm Password"
               className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -122,8 +170,9 @@ const SignupForm: React.FC<Props> = ({ onSwitchToLogin }) => {
               Already have an account?{" "}
               <button
                 type="button"
-                className="text-blue-500 underline"
+                className="text-blue-500 underline hover:text-blue-600 disabled:opacity-50"
                 onClick={onSwitchToLogin}
+                disabled={isSubmitting}
               >
                 Login
               </button>

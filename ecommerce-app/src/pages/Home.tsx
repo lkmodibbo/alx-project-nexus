@@ -15,9 +15,9 @@ const Home: React.FC = () => {
       try {
         const data = await getProducts();
         setProducts(data);
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        setError("Failed to load products.");
+        setError(err?.message || "Failed to load products.");
       } finally {
         setLoading(false);
       }
@@ -26,7 +26,9 @@ const Home: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <p className="text-center mt-6">Loading products...</p>;
+    return <p
+      className="text-center mt-6"
+    >Loading products...</p>;
   }
 
   if (error) {
