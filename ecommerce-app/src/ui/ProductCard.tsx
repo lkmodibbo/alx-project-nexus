@@ -14,7 +14,7 @@ const ProductCard: React.FC<Props> = ({ product }) => {
     productImages[product.id] || productImages.default;
 
   const renderStars = (rating?: number) => {
-    const score = Math.round(rating ?? 0);
+    const score = Math.round(rating ?? 3); // default to 3 stars if no rating
     return (
       <div className="flex items-center mt-1">
         {Array.from({ length: 5 }).map((_, i) => (
@@ -22,21 +22,22 @@ const ProductCard: React.FC<Props> = ({ product }) => {
             ★
           </span>
         ))}
-        <span className="text-xs text-gray-500 ml-2">({rating ?? 0})</span>
+        <span className="text-xs text-gray-500 ml-2">({score})</span>
       </div>
     );
   }
   return (
-    <div className="border rounded-md bg-white shadow-sm hover:shadow-md transition overflow-hidden max-w-[220px]">
+    <div className="border rounded-md bg-white shadow-sm hover:shadow-md transition overflow-hidden max-w-[320px]">
       <img
         src={imageUrl}
         alt={product.name}
-        className="w-full h-56 object-cover"
+        className="w-full h-32 object-cover"
       />
       <div className="p-3">
         <h3 className="text-sm font-semibold text-gray-800">
           {product.name}
         </h3>
+        {renderStars(product.rating)}
         <p className="text-xs text-gray-500 mt-1">
           {product.category || "Fashion Item"}
         </p>
